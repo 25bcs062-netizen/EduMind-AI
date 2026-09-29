@@ -1,0 +1,2148 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>EduMind AI - AI Learning Assistant</title>
+
+    <!-- Markdown -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <!-- Math -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+
+    <script defer
+            src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js">
+    </script>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+
+        body {
+
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+
+            height: 100vh;
+
+            overflow: hidden;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #0f172a,
+                    #172554,
+                    #312e81,
+                    #0f172a
+                );
+
+            background-size: 400% 400%;
+
+            animation:
+                backgroundMove 15s ease infinite;
+
+            color: #111827;
+
+        }
+
+
+        /* =========================================
+           ANIMATED BACKGROUND
+        ========================================= */
+
+        body::before {
+
+            content: "";
+
+            position: fixed;
+
+            width: 450px;
+            height: 450px;
+
+            border-radius: 50%;
+
+            background: #6366f1;
+
+            filter: blur(120px);
+
+            opacity: 0.30;
+
+            top: -180px;
+            left: -150px;
+
+            pointer-events: none;
+
+            z-index: -1;
+
+            animation:
+                glowOne 9s ease-in-out infinite alternate;
+
+        }
+
+
+        body::after {
+
+            content: "";
+
+            position: fixed;
+
+            width: 450px;
+            height: 450px;
+
+            border-radius: 50%;
+
+            background: #06b6d4;
+
+            filter: blur(120px);
+
+            opacity: 0.25;
+
+            right: -180px;
+            bottom: -180px;
+
+            pointer-events: none;
+
+            z-index: -1;
+
+            animation:
+                glowTwo 11s ease-in-out infinite alternate;
+
+        }
+
+
+        @keyframes backgroundMove {
+
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+
+        }
+
+
+        @keyframes glowOne {
+
+            0% {
+
+                transform:
+                    translate(0, 0)
+                    scale(1);
+
+            }
+
+            50% {
+
+                transform:
+                    translate(130px, 100px)
+                    scale(1.2);
+
+            }
+
+            100% {
+
+                transform:
+                    translate(-40px, 170px)
+                    scale(0.9);
+
+            }
+
+        }
+
+
+        @keyframes glowTwo {
+
+            0% {
+
+                transform:
+                    translate(0, 0)
+                    scale(1);
+
+            }
+
+            50% {
+
+                transform:
+                    translate(-120px, -100px)
+                    scale(1.2);
+
+            }
+
+            100% {
+
+                transform:
+                    translate(60px, -150px)
+                    scale(0.9);
+
+            }
+
+        }
+
+
+        /* =========================================
+           FLOATING PARTICLES
+        ========================================= */
+
+        .particles {
+
+            position: fixed;
+
+            inset: 0;
+
+            pointer-events: none;
+
+            overflow: hidden;
+
+            z-index: -1;
+
+        }
+
+
+        .particle {
+
+            position: absolute;
+
+            width: 6px;
+            height: 6px;
+
+            background: rgba(255,255,255,0.45);
+
+            border-radius: 50%;
+
+            animation:
+                particleFloat 10s linear infinite;
+
+        }
+
+
+        .particle:nth-child(1) {
+            left: 10%;
+            top: 80%;
+            animation-delay: 0s;
+        }
+
+        .particle:nth-child(2) {
+            left: 20%;
+            top: 60%;
+            animation-delay: 2s;
+        }
+
+        .particle:nth-child(3) {
+            left: 35%;
+            top: 90%;
+            animation-delay: 4s;
+        }
+
+        .particle:nth-child(4) {
+            left: 50%;
+            top: 70%;
+            animation-delay: 1s;
+        }
+
+        .particle:nth-child(5) {
+            left: 65%;
+            top: 85%;
+            animation-delay: 3s;
+        }
+
+        .particle:nth-child(6) {
+            left: 80%;
+            top: 65%;
+            animation-delay: 5s;
+        }
+
+        .particle:nth-child(7) {
+            left: 90%;
+            top: 90%;
+            animation-delay: 7s;
+        }
+
+
+        @keyframes particleFloat {
+
+            0% {
+
+                transform:
+                    translateY(0)
+                    scale(1);
+
+                opacity: 0;
+
+            }
+
+            20% {
+                opacity: 1;
+            }
+
+            80% {
+                opacity: 1;
+            }
+
+            100% {
+
+                transform:
+                    translateY(-700px)
+                    scale(0.2);
+
+                opacity: 0;
+
+            }
+
+        }
+
+
+        /* =========================================
+           MAIN APP
+        ========================================= */
+
+        .app {
+
+            display: flex;
+
+            width: 100%;
+
+            height: 100vh;
+
+        }
+
+
+        /* =========================================
+           SIDEBAR
+        ========================================= */
+
+        .sidebar {
+
+            width: 270px;
+
+            height: 100vh;
+
+            padding: 20px;
+
+            background:
+                rgba(15, 23, 42, 0.88);
+
+            backdrop-filter: blur(18px);
+
+            border-right:
+                1px solid rgba(255,255,255,0.12);
+
+            color: white;
+
+            overflow-y: auto;
+
+        }
+
+
+        .logo {
+
+            font-size: 25px;
+
+            font-weight: bold;
+
+            margin-bottom: 20px;
+
+            text-align: center;
+
+        }
+
+
+        .new-chat {
+
+            width: 100%;
+
+            padding: 12px;
+
+            border: none;
+
+            border-radius: 10px;
+
+            background:
+                rgba(255,255,255,0.12);
+
+            color: white;
+
+            cursor: pointer;
+
+            font-size: 15px;
+
+            margin-bottom: 20px;
+
+        }
+
+
+        .new-chat:hover {
+
+            background:
+                rgba(255,255,255,0.20);
+
+        }
+
+
+        .section-title {
+
+            font-size: 12px;
+
+            color: #cbd5e1;
+
+            margin:
+                18px 0 10px;
+
+            text-transform:
+                uppercase;
+
+            letter-spacing: 1px;
+
+        }
+
+
+        .subject-button,
+        .feature-button {
+
+            width: 100%;
+
+            border: none;
+
+            border-radius: 8px;
+
+            padding: 10px;
+
+            margin-bottom: 7px;
+
+            text-align: left;
+
+            cursor: pointer;
+
+            background:
+                rgba(255,255,255,0.08);
+
+            color: white;
+
+            transition: 0.2s;
+
+        }
+
+
+        .subject-button:hover,
+        .feature-button:hover {
+
+            background:
+                rgba(255,255,255,0.18);
+
+            transform:
+                translateX(3px);
+
+        }
+
+
+        .subject-button.active {
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #6366f1,
+                    #06b6d4
+                );
+
+        }
+
+
+        .sidebar-info {
+
+            margin-top: 25px;
+
+            padding: 12px;
+
+            border-radius: 10px;
+
+            background:
+                rgba(255,255,255,0.07);
+
+            font-size: 12px;
+
+            line-height: 1.6;
+
+            color: #cbd5e1;
+
+        }
+
+
+        /* =========================================
+           MAIN AREA
+        ========================================= */
+
+        .main {
+
+            flex: 1;
+
+            display: flex;
+
+            flex-direction: column;
+
+            min-width: 0;
+
+        }
+
+
+        /* =========================================
+           HEADER
+        ========================================= */
+
+        .header {
+
+            padding: 18px 25px;
+
+            background:
+                rgba(255,255,255,0.92);
+
+            backdrop-filter: blur(15px);
+
+            border-bottom:
+                1px solid #e5e7eb;
+
+            display: flex;
+
+            justify-content:
+                space-between;
+
+            align-items: center;
+
+        }
+
+
+        .header-title {
+
+            font-size: 22px;
+
+            font-weight: bold;
+
+        }
+
+
+        .header-subtitle {
+
+            font-size: 13px;
+
+            color: #64748b;
+
+            margin-top: 4px;
+
+        }
+
+
+        .status {
+
+            padding:
+                7px 12px;
+
+            border-radius: 20px;
+
+            background: #dcfce7;
+
+            color: #166534;
+
+            font-size: 12px;
+
+        }
+
+
+        /* =========================================
+           CHAT
+        ========================================= */
+
+        .chat {
+
+            flex: 1;
+
+            overflow-y: auto;
+
+            padding:
+                30px;
+
+        }
+
+
+        .welcome {
+
+            max-width: 750px;
+
+            margin:
+                60px auto;
+
+            text-align: center;
+
+            background:
+                rgba(255,255,255,0.92);
+
+            backdrop-filter: blur(15px);
+
+            padding: 35px;
+
+            border-radius: 20px;
+
+            box-shadow:
+                0 20px 60px
+                rgba(0,0,0,0.18);
+
+        }
+
+
+        .welcome h1 {
+
+            font-size: 32px;
+
+            margin-bottom: 12px;
+
+        }
+
+
+        .welcome p {
+
+            color: #64748b;
+
+            line-height: 1.6;
+
+        }
+
+
+        .selected-subject {
+
+            display: inline-block;
+
+            margin-top: 18px;
+
+            padding:
+                8px 15px;
+
+            border-radius: 20px;
+
+            background:
+                #e0e7ff;
+
+            color:
+                #3730a3;
+
+            font-size: 13px;
+
+        }
+
+
+        /* =========================================
+           MESSAGES
+        ========================================= */
+
+        .message {
+
+            display: flex;
+
+            margin-bottom: 20px;
+
+        }
+
+
+        .message.user {
+
+            justify-content:
+                flex-end;
+
+        }
+
+
+        .message.bot {
+
+            justify-content:
+                flex-start;
+
+        }
+
+
+        .bubble {
+
+            max-width: 78%;
+
+            padding:
+                14px 17px;
+
+            border-radius: 15px;
+
+            line-height: 1.6;
+
+            white-space: normal;
+
+            word-wrap: break-word;
+
+            box-shadow:
+                0 8px 25px
+                rgba(0,0,0,0.08);
+
+        }
+
+
+        .user .bubble {
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #4f46e5,
+                    #06b6d4
+                );
+
+            color: white;
+
+            border-bottom-right-radius: 4px;
+
+        }
+
+
+        .bot .bubble {
+
+            background:
+                rgba(255,255,255,0.95);
+
+            color: #1e293b;
+
+            border-bottom-left-radius: 4px;
+
+        }
+
+
+        .bubble pre {
+
+            background: #0f172a;
+
+            color: #e2e8f0;
+
+            padding: 15px;
+
+            border-radius: 10px;
+
+            overflow-x: auto;
+
+            margin: 10px 0;
+
+        }
+
+
+        .bubble code {
+
+            font-family:
+                Consolas,
+                monospace;
+
+        }
+
+
+        .bubble ul,
+        .bubble ol {
+
+            padding-left: 25px;
+
+            margin: 8px 0;
+
+        }
+
+
+        .bubble h1,
+        .bubble h2,
+        .bubble h3 {
+
+            margin:
+                12px 0 8px;
+
+        }
+
+
+        .copy-button {
+
+            margin-top: 8px;
+
+            padding:
+                5px 10px;
+
+            border: none;
+
+            border-radius: 6px;
+
+            cursor: pointer;
+
+            background:
+                #e2e8f0;
+
+            color: #334155;
+
+            font-size: 11px;
+
+        }
+
+
+        .copy-button:hover {
+
+            background:
+                #cbd5e1;
+
+        }
+
+
+        /* =========================================
+           THINKING
+        ========================================= */
+
+        .thinking {
+
+            display: flex;
+
+            gap: 5px;
+
+            padding: 8px;
+
+        }
+
+
+        .dot {
+
+            width: 8px;
+            height: 8px;
+
+            border-radius: 50%;
+
+            background:
+                #6366f1;
+
+            animation:
+                blink 1.4s infinite;
+
+        }
+
+
+        .dot:nth-child(2) {
+
+            animation-delay:
+                0.2s;
+
+        }
+
+
+        .dot:nth-child(3) {
+
+            animation-delay:
+                0.4s;
+
+        }
+
+
+        @keyframes blink {
+
+            0% {
+                opacity: 0.2;
+            }
+
+            50% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0.2;
+            }
+
+        }
+
+
+        /* =========================================
+           INPUT
+        ========================================= */
+
+        .input-area {
+
+            padding:
+                15px 20px;
+
+            background:
+                rgba(255,255,255,0.94);
+
+            backdrop-filter: blur(15px);
+
+            border-top:
+                1px solid #e5e7eb;
+
+            display: flex;
+
+            gap: 10px;
+
+        }
+
+
+        textarea {
+
+            flex: 1;
+
+            height: 58px;
+
+            resize: none;
+
+            border:
+                1px solid #cbd5e1;
+
+            border-radius: 12px;
+
+            padding: 15px;
+
+            font-size: 15px;
+
+            outline: none;
+
+        }
+
+
+        textarea:focus {
+
+            border-color:
+                #6366f1;
+
+            box-shadow:
+                0 0 0 3px
+                rgba(99,102,241,0.12);
+
+        }
+
+
+        .send-button {
+
+            width: 95px;
+
+            border: none;
+
+            border-radius: 12px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #4f46e5,
+                    #06b6d4
+                );
+
+            color: white;
+
+            font-size: 15px;
+
+            cursor: pointer;
+
+        }
+
+
+        .send-button:hover {
+
+            transform:
+                translateY(-1px);
+
+            box-shadow:
+                0 8px 20px
+                rgba(79,70,229,0.30);
+
+        }
+
+
+        .send-button:disabled {
+
+            opacity: 0.5;
+
+            cursor: not-allowed;
+
+        }
+
+
+        /* =========================================
+           MOBILE
+        ========================================= */
+
+        @media (max-width: 800px) {
+
+            .sidebar {
+
+                width: 210px;
+
+            }
+
+            .bubble {
+
+                max-width: 90%;
+
+            }
+
+        }
+
+
+        @media (max-width: 600px) {
+
+            .sidebar {
+
+                width: 170px;
+
+                padding: 12px;
+
+            }
+
+            .logo {
+
+                font-size: 20px;
+
+            }
+
+            .header {
+
+                padding: 12px;
+
+            }
+
+            .header-title {
+
+                font-size: 17px;
+
+            }
+
+            .chat {
+
+                padding: 15px;
+
+            }
+
+            .input-area {
+
+                padding: 10px;
+
+            }
+
+            .send-button {
+
+                width: 70px;
+
+            }
+
+            .welcome {
+
+                margin: 30px auto;
+
+                padding: 22px;
+
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- =========================================
+     BACKGROUND PARTICLES
+========================================= -->
+
+<div class="particles">
+
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+
+</div>
+
+
+<div class="app">
+
+
+    <!-- =====================================
+         SIDEBAR
+    ====================================== -->
+
+    <aside class="sidebar">
+
+
+        <div class="logo">
+
+            🎓 EduMind AI
+
+        </div>
+
+
+        <button
+            class="new-chat"
+            onclick="newChat()">
+
+            ➕ New Chat
+
+        </button>
+
+
+        <div class="section-title">
+
+            Subjects
+
+        </div>
+
+
+        <button
+            class="subject-button"
+            onclick="selectSubject('Python', this)">
+
+            🐍 Python
+
+        </button>
+
+
+        <button
+            class="subject-button"
+            onclick="selectSubject('Java', this)">
+
+            ☕ Java
+
+        </button>
+
+
+        <button
+            class="subject-button"
+            onclick="selectSubject('C++', this)">
+
+            💻 C++
+
+        </button>
+
+
+        <button
+            class="subject-button"
+            onclick="selectSubject('C', this)">
+
+            🔵 C
+
+        </button>
+
+
+        <button
+            class="subject-button"
+            onclick="selectSubject('Computer Architecture', this)">
+
+            🖥️ Computer Architecture
+
+        </button>
+
+
+        <button
+            class="subject-button"
+            onclick="selectSubject('Data Structures', this)">
+
+            🌳 Data Structures
+
+        </button>
+
+
+        <button
+            class="subject-button"
+            onclick="selectSubject('DBMS', this)">
+
+            🗄️ DBMS
+
+        </button>
+
+
+        <button
+            class="subject-button"
+            onclick="selectSubject('Computer Networks', this)">
+
+            🌐 Computer Networks
+
+        </button>
+
+
+        <button
+            class="subject-button"
+            onclick="selectSubject('Operating Systems', this)">
+
+            ⚙️ Operating Systems
+
+        </button>
+
+
+        <button
+            class="subject-button"
+            onclick="selectSubject('AI & ML', this)">
+
+            🤖 AI & ML
+
+        </button>
+
+
+        <div class="section-title">
+
+            AI Tools
+
+        </div>
+
+
+        <button
+            class="feature-button"
+            onclick="explainTopic()">
+
+            📖 Explain
+
+        </button>
+
+
+        <button
+            class="feature-button"
+            onclick="startQuiz()">
+
+            🧠 Quiz
+
+        </button>
+
+
+        <button
+            class="feature-button"
+            onclick="generateNotes()">
+
+            📝 Study Notes
+
+        </button>
+
+
+        <button
+            class="feature-button"
+            onclick="summarizeTopic()">
+
+            📄 Summarize
+
+        </button>
+
+
+        <button
+            class="feature-button"
+            onclick="learningPath()">
+
+            🛣️ Learning Path
+
+        </button>
+
+
+        <div class="sidebar-info">
+
+            <strong> AI</strong>
+
+            <br><br>
+
+            Ask questions about:
+
+            <br>
+
+            Python, Java, C, C++,
+            Mathematics, Science,
+            Technology and more.
+
+        </div>
+
+
+    </aside>
+
+
+
+    <!-- =====================================
+         MAIN
+    ====================================== -->
+
+    <main class="main">
+
+
+        <header class="header">
+
+
+            <div>
+
+                <div class="header-title">
+
+                     AI Learning Assistant
+
+                </div>
+
+                <div class="header-subtitle">
+
+                    Learn • Ask • Explain • Practice
+
+                </div>
+
+            </div>
+
+
+            <div class="status">
+
+                ● AI Online
+
+            </div>
+
+
+        </header>
+
+
+
+        <!-- =================================
+             CHAT AREA
+        ================================== -->
+
+        <div
+            id="chat"
+            class="chat">
+
+
+            <div
+                id="welcome"
+                class="welcome">
+
+
+                <h1>
+
+                    👋 <h1>👋 Welcome to EduMind AI</h1>
+
+                </h1>
+
+
+                <p>
+
+                    Your AI-powered educational
+                    learning assistant.
+
+                    <br><br>
+
+                    Ask any question and
+                     will help you
+                    understand it.
+
+                </p>
+
+
+                <div
+                    id="selectedSubject"
+                    class="selected-subject">
+
+                    No subject selected
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+
+
+        <!-- =================================
+             INPUT
+        ================================== -->
+
+        <div class="input-area">
+
+
+            <textarea
+                id="questionInput"
+                placeholder="Ask  anything..."></textarea>
+
+
+            <button
+                id="sendButton"
+                class="send-button"
+                onclick="askQuestion()">
+
+                Send ➤
+
+            </button>
+
+
+        </div>
+
+
+    </main>
+
+
+</div>
+
+
+
+<script>
+
+
+/* =========================================
+   GLOBAL VARIABLES
+========================================= */
+
+let selectedSubject = "";
+
+
+/* =========================================
+   SELECT SUBJECT
+========================================= */
+
+function selectSubject(subject, button) {
+
+    selectedSubject = subject;
+
+
+    document
+        .querySelectorAll(".subject-button")
+        .forEach(function(btn) {
+
+            btn.classList.remove("active");
+
+        });
+
+
+    button.classList.add("active");
+
+
+    document
+        .getElementById("selectedSubject")
+        .textContent =
+            "📚 Subject: " + subject;
+
+
+    document
+        .getElementById("questionInput")
+        .focus();
+
+}
+
+
+/* =========================================
+   NEW CHAT
+========================================= */
+
+function newChat() {
+
+    const chat =
+        document.getElementById("chat");
+
+
+    chat.innerHTML = `
+
+        <div
+            id="welcome"
+            class="welcome">
+
+            <h1>
+                👋 Welcome to 
+            </h1>
+
+            <p>
+                Your AI-powered educational
+                learning assistant.
+                <br><br>
+                Ask any question and 
+                will help you understand it.
+            </p>
+
+            <div
+                id="selectedSubject"
+                class="selected-subject">
+
+                ${selectedSubject
+                    ? "📚 Subject: " + selectedSubject
+                    : "No subject selected"}
+
+            </div>
+
+        </div>
+
+    `;
+
+}
+
+
+/* =========================================
+   REMOVE WELCOME
+========================================= */
+
+function removeWelcome() {
+
+    const welcome =
+        document.getElementById("welcome");
+
+
+    if (welcome) {
+
+        welcome.remove();
+
+    }
+
+}
+
+
+/* =========================================
+   ADD MESSAGE
+========================================= */
+
+function addMessage(
+    text,
+    type,
+    renderMarkdown = false
+) {
+
+    const chat =
+        document.getElementById("chat");
+
+
+    const message =
+        document.createElement("div");
+
+
+    message.className =
+        "message " + type;
+
+
+    const bubble =
+        document.createElement("div");
+
+
+    bubble.className =
+        "bubble";
+
+
+    if (typeof text !== "string") {
+        if (Array.isArray(text)) {
+            const isQuiz = text.length > 0 && text.every(function(item) {
+                return item && typeof item === "object" && item.question && item.options;
+            });
+
+            if (isQuiz) {
+                const letters = ["A", "B", "C", "D"];
+                text = text.map(function(item, idx) {
+                    const optionsList = (item.options || []).map(function(opt, optIdx) {
+                        return "  - **" + (letters[optIdx] || (optIdx + 1)) + ".** " + opt;
+                    }).join("\n");
+
+                    return "### ❓ Question " + (idx + 1) + "\n" +
+                           "**" + item.question + "**\n\n" +
+                           optionsList + "\n\n" +
+                           "<details style='margin-top: 10px; background: #f8fafc; padding: 10px 14px; border-radius: 8px; border: 1px solid #e2e8f0; cursor: pointer;'>" +
+                           "<summary style='font-weight: 600; color: #4f46e5;'>💡 Click to View Answer</summary>" +
+                           "<div style='margin-top: 8px; color: #166534; font-weight: 600;'>✅ Correct Answer: " + item.answer + "</div>" +
+                           "</details>";
+                }).join("\n\n---\n\n");
+            } else {
+                text = text.map(function(item) {
+                    if (typeof item === "string") return item;
+                    return JSON.stringify(item, null, 2);
+                }).join("\n\n");
+            }
+        }
+        else {
+            text = JSON.stringify(text, null, 2);
+        }
+    }
+
+
+    if (renderMarkdown) {
+
+        try {
+
+            bubble.innerHTML =
+                marked.parse(text);
+
+        }
+        catch (error) {
+
+            bubble.textContent =
+                text;
+
+        }
+
+    }
+    else {
+
+        bubble.textContent =
+            text;
+
+    }
+
+
+    message.appendChild(bubble);
+
+
+    chat.appendChild(message);
+
+
+    chat.scrollTop =
+        chat.scrollHeight;
+
+
+    return message;
+
+}
+
+
+/* =========================================
+   THINKING
+========================================= */
+
+function addThinkingMessage() {
+
+    const chat =
+        document.getElementById("chat");
+
+
+    const message =
+        document.createElement("div");
+
+
+    message.className =
+        "message bot";
+
+
+    message.innerHTML = `
+
+        <div class="bubble">
+
+            <div class="thinking">
+
+                <div class="dot"></div>
+
+                <div class="dot"></div>
+
+                <div class="dot"></div>
+
+            </div>
+
+        </div>
+
+    `;
+
+
+    chat.appendChild(message);
+
+
+    chat.scrollTop =
+        chat.scrollHeight;
+
+
+    return message;
+
+}
+
+
+/* =========================================
+   GENERIC POST
+========================================= */
+
+async function sendRequest(
+    url,
+    formData,
+    errorName
+) {
+
+    const thinking =
+        addThinkingMessage();
+
+
+    try {
+
+        const response =
+            await fetch(
+                url,
+                {
+                    method: "POST",
+                    body: formData
+                }
+            );
+
+
+        const rawText =
+            await response.text();
+
+
+        thinking.remove();
+
+
+        if (!response.ok) {
+
+            addMessage(
+                "⚠️ " +
+                errorName +
+                " service error.\n\n" +
+                rawText,
+                "bot"
+            );
+
+            return;
+
+        }
+
+
+        let data;
+
+
+        try {
+
+            data =
+                JSON.parse(rawText);
+
+        }
+        catch (error) {
+
+            addMessage(
+                "⚠️ Invalid server response.\n\n" +
+                rawText,
+                "bot"
+            );
+
+            return;
+
+        }
+
+
+        if (
+            data.success &&
+            data.result
+        ) {
+
+            addMessage(
+                data.result,
+                "bot",
+                true
+            );
+
+        }
+        else {
+
+            addMessage(
+                "⚠️ No result was returned.",
+                "bot"
+            );
+
+        }
+
+
+    }
+    catch (error) {
+
+        thinking.remove();
+
+
+        addMessage(
+            "⚠️ Unable to connect to .\n\n" +
+            error.message,
+            "bot"
+        );
+
+        console.error(
+            errorName + " error:",
+            error
+        );
+
+    }
+
+}
+
+
+/* =========================================
+   ASK QUESTION
+========================================= */
+
+async function askQuestion() {
+
+    const input =
+        document.getElementById(
+            "questionInput"
+        );
+
+
+    let question =
+        input.value.trim();
+
+
+    if (!question) {
+
+        return;
+
+    }
+
+
+    removeWelcome();
+
+
+    let displayQuestion =
+        question;
+
+
+    if (selectedSubject) {
+
+        displayQuestion =
+            "📚 " +
+            selectedSubject +
+            "\n\n" +
+            question;
+
+    }
+
+
+    addMessage(
+        displayQuestion,
+        "user"
+    );
+
+
+    input.value = "";
+
+
+    const formData =
+        new FormData();
+
+
+    formData.append(
+        "question",
+        selectedSubject
+            ? "Subject: " +
+              selectedSubject +
+              "\n\nQuestion: " +
+              question
+            : question
+    );
+
+
+    await sendRequest(
+        "/qa",
+        formData,
+        "Question Answer"
+    );
+
+}
+
+
+/* =========================================
+   EXPLAIN
+========================================= */
+
+async function explainTopic() {
+
+    const topic =
+        prompt(
+            "What topic do you want  to explain?"
+        );
+
+
+    if (
+        !topic ||
+        !topic.trim()
+    ) {
+
+        return;
+
+    }
+
+
+    removeWelcome();
+
+
+    addMessage(
+        "📖 Explain: " + topic,
+        "user"
+    );
+
+
+    const formData =
+        new FormData();
+
+
+    formData.append(
+        "text",
+        topic
+    );
+
+
+    await sendRequest(
+        "/explain",
+        formData,
+        "Explain"
+    );
+
+}
+
+
+/* =========================================
+   QUIZ
+========================================= */
+
+async function startQuiz() {
+
+    const topic =
+        prompt(
+            "Which topic do you want a quiz about?"
+        );
+
+
+    if (
+        !topic ||
+        !topic.trim()
+    ) {
+
+        return;
+
+    }
+
+
+    removeWelcome();
+
+
+    addMessage(
+        "🧠 Quiz: " + topic,
+        "user"
+    );
+
+
+    const formData =
+        new FormData();
+
+
+    formData.append(
+        "text",
+        topic
+    );
+
+
+    await sendRequest(
+        "/quiz",
+        formData,
+        "Quiz"
+    );
+
+}
+
+
+/* =========================================
+   STUDY NOTES
+========================================= */
+
+async function generateNotes() {
+
+    const topic =
+        prompt(
+            "Which topic do you want study notes for?"
+        );
+
+
+    if (
+        !topic ||
+        !topic.trim()
+    ) {
+
+        return;
+
+    }
+
+
+    removeWelcome();
+
+
+    addMessage(
+        "📝 Study Notes: " + topic,
+        "user"
+    );
+
+
+    const formData =
+        new FormData();
+
+
+    formData.append(
+        "text",
+        topic
+    );
+
+
+    await sendRequest(
+        "/notes",
+        formData,
+        "Study Notes"
+    );
+
+}
+
+
+/* =========================================
+   SUMMARIZE
+========================================= */
+
+async function summarizeTopic() {
+
+    const text =
+        prompt(
+            "Paste the text you want  to summarize:"
+        );
+
+
+    if (
+        !text ||
+        !text.trim()
+    ) {
+
+        return;
+
+    }
+
+
+    removeWelcome();
+
+
+    addMessage(
+        "📄 Summarize:\n\n" + text,
+        "user"
+    );
+
+
+    const formData =
+        new FormData();
+
+
+    formData.append(
+        "text",
+        text
+    );
+
+
+    await sendRequest(
+        "/summarize",
+        formData,
+        "Summarize"
+    );
+
+}
+
+
+/* =========================================
+   LEARNING PATH
+========================================= */
+
+async function learningPath() {
+
+    const topic =
+        prompt(
+            "What topic do you want to learn?"
+        );
+
+
+    if (
+        !topic ||
+        !topic.trim()
+    ) {
+
+        return;
+
+    }
+
+
+    const level =
+        prompt(
+            "What is your level?\n\n" +
+            "Beginner\n" +
+            "Intermediate\n" +
+            "Advanced",
+            "Beginner"
+        );
+
+
+    if (
+        !level ||
+        !level.trim()
+    ) {
+
+        return;
+
+    }
+
+
+    removeWelcome();
+
+
+    addMessage(
+        "🛣️ Learning Path: " +
+        topic +
+        "\nLevel: " +
+        level,
+        "user"
+    );
+
+
+    const formData =
+        new FormData();
+
+
+    formData.append(
+        "topic",
+        topic
+    );
+
+
+    formData.append(
+        "level",
+        level
+    );
+
+
+    await sendRequest(
+        "/learn/recommendations",
+        formData,
+        "Learning Path"
+    );
+
+}
+
+
+/* =========================================
+   ENTER KEY
+========================================= */
+
+document
+    .getElementById("questionInput")
+    .addEventListener(
+        "keydown",
+        function(event) {
+
+            if (
+                event.key === "Enter" &&
+                !event.shiftKey
+            ) {
+
+                event.preventDefault();
+
+                askQuestion();
+
+            }
+
+        }
+    );
+
+
+</script>
+
+
+</body>
+
+</html>

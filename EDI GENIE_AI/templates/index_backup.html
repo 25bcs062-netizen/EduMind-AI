@@ -1,0 +1,2078 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>EduGenie AI</title>
+
+
+    <!-- Markdown -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+
+    <!-- KaTeX -->
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"
+    >
+
+    <script
+        defer
+        src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js">
+    </script>
+
+    <script
+        defer
+        src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js">
+    </script>
+
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            color: #222;
+        }
+
+
+        .app {
+            display: flex;
+            height: 100vh;
+            width: 100%;
+        }
+
+
+        /* =========================
+           SIDEBAR
+        ========================= */
+
+        .sidebar {
+            width: 250px;
+            background: #202123;
+            color: white;
+            padding: 20px;
+
+            display: flex;
+            flex-direction: column;
+
+            flex-shrink: 0;
+        }
+
+
+        .logo {
+            font-size: 25px;
+            font-weight: bold;
+            margin-bottom: 25px;
+        }
+
+
+        .new-chat {
+            width: 100%;
+
+            padding: 12px;
+
+            background: #343541;
+
+            border: 1px solid #555;
+
+            border-radius: 8px;
+
+            color: white;
+
+            font-size: 15px;
+
+            cursor: pointer;
+        }
+
+
+        .new-chat:hover {
+            background: #444654;
+        }
+
+
+        .sidebar-info {
+            margin-top: auto;
+
+            color: #aaa;
+
+            font-size: 13px;
+
+            line-height: 1.6;
+        }
+
+
+        /* =========================
+           MAIN
+        ========================= */
+
+        .main {
+            flex: 1;
+
+            min-width: 0;
+
+            display: flex;
+
+            flex-direction: column;
+        }
+
+
+        /* =========================
+           HEADER
+        ========================= */
+
+        .header {
+            min-height: 65px;
+
+            background: white;
+
+            border-bottom: 1px solid #ddd;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 8px;
+
+            padding: 10px 20px;
+
+            flex-wrap: wrap;
+        }
+
+
+        .header-title {
+            font-size: 20px;
+
+            font-weight: bold;
+
+            margin-right: auto;
+        }
+
+
+        .feature-button {
+            padding: 9px 12px;
+
+            border: none;
+
+            border-radius: 8px;
+
+            background: #10a37f;
+
+            color: white;
+
+            font-size: 13px;
+
+            cursor: pointer;
+
+            white-space: nowrap;
+        }
+
+
+        .feature-button:hover {
+            background: #0d8f70;
+        }
+
+
+        /* =========================
+           CHAT AREA
+        ========================= */
+
+        .chat {
+            flex: 1;
+
+            overflow-y: auto;
+
+            padding: 30px;
+        }
+
+
+        .welcome {
+            text-align: center;
+
+            margin-top: 100px;
+
+            color: #666;
+        }
+
+
+        .welcome h1 {
+            color: #222;
+
+            font-size: 32px;
+
+            margin-bottom: 10px;
+        }
+
+
+        .welcome p {
+            font-size: 16px;
+        }
+
+
+        /* =========================
+           MESSAGES
+        ========================= */
+
+        .message {
+            display: flex;
+
+            margin-bottom: 20px;
+        }
+
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+
+        .message.bot {
+            justify-content: flex-start;
+        }
+
+
+        .bubble {
+            max-width: 82%;
+
+            padding: 16px 20px;
+
+            border-radius: 14px;
+
+            line-height: 1.6;
+
+            font-size: 16px;
+
+            overflow-wrap: break-word;
+        }
+
+
+        .user .bubble {
+            background: #10a37f;
+
+            color: white;
+
+            border-bottom-right-radius: 4px;
+        }
+
+
+        .bot .bubble {
+            background: white;
+
+            color: #222;
+
+            border: 1px solid #ddd;
+
+            border-bottom-left-radius: 4px;
+        }
+
+
+        /* =========================
+           MARKDOWN
+        ========================= */
+
+        .bubble h1,
+        .bubble h2,
+        .bubble h3 {
+            margin-top: 12px;
+
+            margin-bottom: 10px;
+        }
+
+
+        .bubble p {
+            margin: 8px 0;
+        }
+
+
+        .bubble ul,
+        .bubble ol {
+            padding-left: 25px;
+        }
+
+
+        .bubble li {
+            margin-bottom: 6px;
+        }
+
+
+        /* =========================
+           TABLE
+        ========================= */
+
+        .bubble table {
+            border-collapse: collapse;
+
+            width: 100%;
+
+            margin: 15px 0;
+        }
+
+
+        .bubble th,
+        .bubble td {
+            border: 1px solid #ccc;
+
+            padding: 8px;
+
+            text-align: left;
+        }
+
+
+        .bubble th {
+            background: #eee;
+        }
+
+
+        /* =========================
+           CODE
+        ========================= */
+
+        .code-container {
+            position: relative;
+
+            margin: 15px 0;
+        }
+
+
+        .bubble pre {
+            background: #1e1e1e;
+
+            color: #f5f5f5;
+
+            padding: 45px 15px 15px 15px;
+
+            border-radius: 8px;
+
+            overflow-x: auto;
+
+            margin: 0;
+        }
+
+
+        .bubble pre code {
+            font-family: Consolas, monospace;
+
+            font-size: 14px;
+        }
+
+
+        .bubble p code,
+        .bubble li code {
+            background: #eeeeee;
+
+            color: #222;
+
+            padding: 2px 5px;
+
+            border-radius: 4px;
+        }
+
+
+        /* =========================
+           COPY BUTTON
+        ========================= */
+
+        .copy-button {
+            position: absolute;
+
+            top: 8px;
+
+            right: 8px;
+
+            background: #444;
+
+            color: white;
+
+            border: none;
+
+            padding: 6px 10px;
+
+            border-radius: 5px;
+
+            cursor: pointer;
+
+            font-size: 12px;
+        }
+
+
+        .copy-button:hover {
+            background: #666;
+        }
+
+
+        /* =========================
+           THINKING ANIMATION
+        ========================= */
+
+        .thinking {
+            display: flex;
+
+            gap: 5px;
+
+            padding: 5px;
+        }
+
+
+        .dot {
+            width: 8px;
+
+            height: 8px;
+
+            background: #777;
+
+            border-radius: 50%;
+
+            animation: blink 1.4s infinite;
+        }
+
+
+        .dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+
+        .dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+
+        @keyframes blink {
+
+            0% {
+                opacity: 0.2;
+            }
+
+            50% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0.2;
+            }
+
+        }
+
+
+        /* =========================
+           INPUT
+        ========================= */
+
+        .input-area {
+            background: white;
+
+            border-top: 1px solid #ddd;
+
+            padding: 15px 20px;
+
+            display: flex;
+
+            gap: 10px;
+        }
+
+
+        textarea {
+            flex: 1;
+
+            resize: none;
+
+            height: 55px;
+
+            border: 1px solid #ccc;
+
+            border-radius: 10px;
+
+            padding: 15px;
+
+            font-size: 16px;
+
+            outline: none;
+        }
+
+
+        textarea:focus {
+            border-color: #10a37f;
+        }
+
+
+        .send-button {
+            width: 90px;
+
+            border: none;
+
+            border-radius: 10px;
+
+            background: #10a37f;
+
+            color: white;
+
+            font-size: 16px;
+
+            cursor: pointer;
+        }
+
+
+        .send-button:hover {
+            background: #0d8f70;
+        }
+
+
+        .send-button:disabled {
+            background: #999;
+
+            cursor: not-allowed;
+        }
+
+
+        /* =========================
+           MOBILE
+        ========================= */
+
+        @media (max-width: 800px) {
+
+            .sidebar {
+                width: 200px;
+            }
+
+            .chat {
+                padding: 15px;
+            }
+
+            .bubble {
+                max-width: 92%;
+            }
+
+            .feature-button {
+                font-size: 12px;
+
+                padding: 7px 9px;
+            }
+
+        }
+
+
+        @media (max-width: 600px) {
+
+            .sidebar {
+                width: 160px;
+
+                padding: 12px;
+            }
+
+            .logo {
+                font-size: 20px;
+            }
+
+            .sidebar-info {
+                font-size: 11px;
+            }
+
+            .header-title {
+                width: 100%;
+
+                margin-right: 0;
+            }
+
+            .input-area {
+                padding: 10px;
+            }
+
+            .send-button {
+                width: 70px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="app">
+
+
+    <!-- =========================
+         SIDEBAR
+    ========================= -->
+
+    <aside class="sidebar">
+
+
+        <div class="logo">
+            🎓 EduGenie
+        </div>
+
+
+        <button
+            class="new-chat"
+            onclick="newChat()">
+
+            + New Chat
+
+        </button>
+
+
+        <div class="sidebar-info">
+
+            <strong>
+                AI-Powered Educational Assistant
+            </strong>
+
+            <br>
+            <br>
+
+            Ask questions about:
+
+            <br>
+
+            • Programming
+
+            <br>
+
+            • Science
+
+            <br>
+
+            • Mathematics
+
+            <br>
+
+            • Technology
+
+            <br>
+
+            • General Knowledge
+
+        </div>
+
+
+    </aside>
+
+
+
+    <!-- =========================
+         MAIN
+    ========================= -->
+
+    <main class="main">
+
+
+        <!-- HEADER -->
+
+        <header class="header">
+
+
+            <div class="header-title">
+                EduGenie AI
+            </div>
+
+
+            <button
+                class="feature-button"
+                onclick="explainTopic()">
+
+                📖 Explain
+
+            </button>
+
+
+            <button
+                class="feature-button"
+                onclick="startQuiz()">
+
+                🧠 Quiz
+
+            </button>
+
+
+            <button
+                class="feature-button"
+                onclick="summarizeTopic()">
+
+                📝 Summarize
+
+            </button>
+
+
+            <button
+                class="feature-button"
+                onclick="learningPath()">
+
+                🛣️ Learning Path
+
+            </button>
+
+
+        </header>
+
+
+
+        <!-- CHAT -->
+
+        <div
+            class="chat"
+            id="chat">
+
+
+            <div
+                class="welcome"
+                id="welcome">
+
+
+                <h1>
+                    👋 Welcome to EduGenie
+                </h1>
+
+
+                <p>
+                    Ask me anything about programming,
+                    science, mathematics and more.
+                </p>
+
+
+            </div>
+
+
+        </div>
+
+
+
+        <!-- INPUT -->
+
+        <div class="input-area">
+
+
+            <textarea
+                id="question"
+                placeholder="Message EduGenie..."
+                onkeydown="handleKey(event)">
+            </textarea>
+
+
+            <button
+                class="send-button"
+                id="sendButton"
+                onclick="askQuestion()">
+
+                Send
+
+            </button>
+
+
+        </div>
+
+
+    </main>
+
+
+</div>
+
+
+
+<script>
+
+
+/* =====================================================
+   GENERAL QUESTION
+===================================================== */
+
+async function askQuestion() {
+
+
+    const input =
+        document.getElementById("question");
+
+
+    const question =
+        input.value.trim();
+
+
+    if (!question) {
+
+        return;
+
+    }
+
+
+    removeWelcome();
+
+
+    addMessage(
+        question,
+        "user"
+    );
+
+
+    input.value = "";
+
+
+    const thinking =
+        addThinkingMessage();
+
+
+    const sendButton =
+        document.getElementById("sendButton");
+
+
+    sendButton.disabled = true;
+
+
+    try {
+
+
+        const formData =
+            new FormData();
+
+
+        formData.append(
+            "question",
+            question
+        );
+
+
+        const response =
+            await fetch(
+                "/qa",
+                {
+                    method: "POST",
+                    body: formData
+                }
+            );
+
+
+        const rawText =
+            await response.text();
+
+
+        console.log(
+            "QA response:",
+            rawText
+        );
+
+
+        thinking.remove();
+
+
+        if (!response.ok) {
+
+
+            addMessage(
+                "⚠️ AI service error.\n\n" +
+                rawText,
+                "bot"
+            );
+
+
+            return;
+
+        }
+
+
+        let data;
+
+
+        try {
+
+            data =
+                JSON.parse(rawText);
+
+        }
+        catch (jsonError) {
+
+
+            addMessage(
+                "⚠️ Server returned invalid JSON.\n\n" +
+                rawText,
+                "bot"
+            );
+
+
+            console.error(
+                jsonError
+            );
+
+
+            return;
+
+        }
+
+
+        if (
+            data.success &&
+            data.result
+        ) {
+
+
+            addMessage(
+                data.result,
+                "bot",
+                true
+            );
+
+
+        }
+        else {
+
+
+            addMessage(
+                "⚠️ No answer was returned.",
+                "bot"
+            );
+
+        }
+
+
+    }
+    catch (error) {
+
+
+        thinking.remove();
+
+
+        addMessage(
+            "⚠️ Unable to connect to EduGenie.\n\n" +
+            error.message,
+            "bot"
+        );
+
+
+        console.error(
+            "QA error:",
+            error
+        );
+
+
+    }
+    finally {
+
+
+        sendButton.disabled =
+            false;
+
+
+        input.focus();
+
+
+    }
+
+}
+
+
+
+/* =====================================================
+   EXPLAIN
+===================================================== */
+
+async function explainTopic() {
+
+
+    const topic =
+        prompt(
+            "What topic would you like EduGenie to explain?"
+        );
+
+
+    if (
+        !topic ||
+        !topic.trim()
+    ) {
+
+        return;
+
+    }
+
+
+    removeWelcome();
+
+
+    addMessage(
+        "📖 Explain: " + topic,
+        "user"
+    );
+
+
+    const thinking =
+        addThinkingMessage();
+
+
+    try {
+
+
+        const formData =
+            new FormData();
+
+
+        formData.append(
+            "text",
+            topic
+        );
+
+
+        const response =
+            await fetch(
+                "/explain",
+                {
+                    method: "POST",
+                    body: formData
+                }
+            );
+
+
+        const rawText =
+            await response.text();
+
+
+        console.log(
+            "Explain response:",
+            rawText
+        );
+
+
+        thinking.remove();
+
+
+        if (!response.ok) {
+
+
+            addMessage(
+                "⚠️ Explain service error.\n\n" +
+                rawText,
+                "bot"
+            );
+
+
+            return;
+
+        }
+
+
+        let data;
+
+
+        try {
+
+            data =
+                JSON.parse(rawText);
+
+        }
+        catch (error) {
+
+
+            addMessage(
+                "⚠️ Invalid server response.\n\n" +
+                rawText,
+                "bot"
+            );
+
+
+            return;
+
+        }
+
+
+        if (
+            data.success &&
+            data.result
+        ) {
+
+
+            addMessage(
+                data.result,
+                "bot",
+                true
+            );
+
+
+        }
+        else {
+
+
+            addMessage(
+                "⚠️ No explanation was returned.",
+                "bot"
+            );
+
+        }
+
+
+    }
+    catch (error) {
+
+
+        thinking.remove();
+
+
+        addMessage(
+            "⚠️ Unable to connect to EduGenie.\n\n" +
+            error.message,
+            "bot"
+        );
+
+
+        console.error(
+            "Explain error:",
+            error
+        );
+
+    }
+
+}
+
+
+
+/* =====================================================
+   QUIZ
+===================================================== */
+
+async function startQuiz() {
+
+
+    const topic =
+        prompt(
+            "Which topic do you want a quiz about?"
+        );
+
+
+    if (
+        !topic ||
+        !topic.trim()
+    ) {
+
+        return;
+
+    }
+
+
+    removeWelcome();
+
+
+    addMessage(
+        "🧠 Quiz: " + topic,
+        "user"
+    );
+
+
+    const thinking =
+        addThinkingMessage();
+
+
+    try {
+
+
+        const formData =
+            new FormData();
+
+
+        formData.append(
+            "text",
+            topic
+        );
+
+
+        const response =
+            await fetch(
+                "/quiz",
+                {
+                    method: "POST",
+                    body: formData
+                }
+            );
+
+
+        /*
+            IMPORTANT:
+
+            We first read the response
+            as TEXT.
+
+            This helps us see the
+            actual server error if
+            JSON parsing fails.
+        */
+
+        const rawText =
+            await response.text();
+
+
+        console.log(
+            "Quiz response:",
+            rawText
+        );
+
+
+        thinking.remove();
+
+
+        if (!response.ok) {
+
+
+            addMessage(
+                "⚠️ Quiz service error.\n\n" +
+                rawText,
+                "bot"
+            );
+
+
+            return;
+
+        }
+
+
+        let data;
+
+
+        try {
+
+
+            data =
+                JSON.parse(rawText);
+
+
+        }
+        catch (jsonError) {
+
+
+            addMessage(
+                "⚠️ Quiz response is not valid JSON.\n\n" +
+                rawText,
+                "bot"
+            );
+
+
+            console.error(
+                "Quiz JSON error:",
+                jsonError
+            );
+
+
+            return;
+
+        }
+
+
+        if (
+            data.success &&
+            data.result
+        ) {
+
+
+            addMessage(
+                data.result,
+                "bot",
+                true
+            );
+
+
+        }
+        else {
+
+
+            addMessage(
+                "⚠️ Quiz was generated, but no result was returned.",
+                "bot"
+            );
+
+        }
+
+
+    }
+    catch (error) {
+
+
+        thinking.remove();
+
+
+        addMessage(
+            "⚠️ Unable to connect to EduGenie.\n\n" +
+            error.message,
+            "bot"
+        );
+
+
+        console.error(
+            "Quiz error:",
+            error
+        );
+
+    }
+
+}
+
+
+
+/* =====================================================
+   SUMMARIZE
+===================================================== */
+
+async function summarizeTopic() {
+
+
+    const text =
+        prompt(
+            "Paste the text you want EduGenie to summarize:"
+        );
+
+
+    if (
+        !text ||
+        !text.trim()
+    ) {
+
+        return;
+
+    }
+
+
+    removeWelcome();
+
+
+    addMessage(
+        "📝 Summarize: " + text,
+        "user"
+    );
+
+
+    const thinking =
+        addThinkingMessage();
+
+
+    try {
+
+
+        const formData =
+            new FormData();
+
+
+        formData.append(
+            "text",
+            text
+        );
+
+
+        const response =
+            await fetch(
+                "/summarize",
+                {
+                    method: "POST",
+                    body: formData
+                }
+            );
+
+
+        const rawText =
+            await response.text();
+
+
+        console.log(
+            "Summarize response:",
+            rawText
+        );
+
+
+        thinking.remove();
+
+
+        if (!response.ok) {
+
+
+            addMessage(
+                "⚠️ Summarize service error.\n\n" +
+                rawText,
+                "bot"
+            );
+
+
+            return;
+
+        }
+
+
+        let data;
+
+
+        try {
+
+            data =
+                JSON.parse(rawText);
+
+        }
+        catch (error) {
+
+
+            addMessage(
+                "⚠️ Invalid server response.\n\n" +
+                rawText,
+                "bot"
+            );
+
+
+            return;
+
+        }
+
+
+        if (
+            data.success &&
+            data.result
+        ) {
+
+
+            addMessage(
+                data.result,
+                "bot",
+                true
+            );
+
+
+        }
+        else {
+
+
+            addMessage(
+                "⚠️ No summary was returned.",
+                "bot"
+            );
+
+        }
+
+
+    }
+    catch (error) {
+
+
+        thinking.remove();
+
+
+        addMessage(
+            "⚠️ Unable to connect to EduGenie.\n\n" +
+            error.message,
+            "bot"
+        );
+
+
+        console.error(
+            "Summarize error:",
+            error
+        );
+
+    }
+
+}
+
+
+
+/* =====================================================
+   LEARNING PATH
+===================================================== */
+
+async function learningPath() {
+
+
+    const topic =
+        prompt(
+            "What topic do you want to learn?"
+        );
+
+
+    if (
+        !topic ||
+        !topic.trim()
+    ) {
+
+        return;
+
+    }
+
+
+    const level =
+        prompt(
+            "What is your level?\n\n" +
+            "Beginner\n" +
+            "Intermediate\n" +
+            "Advanced",
+            "Beginner"
+        );
+
+
+    if (
+        !level ||
+        !level.trim()
+    ) {
+
+        return;
+
+    }
+
+
+    removeWelcome();
+
+
+    addMessage(
+        "🛣️ Learning Path: " +
+        topic +
+        " (" +
+        level +
+        ")",
+        "user"
+    );
+
+
+    const thinking =
+        addThinkingMessage();
+
+
+    try {
+
+
+        const formData =
+            new FormData();
+
+
+        formData.append(
+            "topic",
+            topic
+        );
+
+
+        formData.append(
+            "level",
+            level
+        );
+
+
+        const response =
+            await fetch(
+                "/learn/recommendations",
+                {
+                    method: "POST",
+                    body: formData
+                }
+            );
+
+
+        const rawText =
+            await response.text();
+
+
+        console.log(
+            "Learning Path response:",
+            rawText
+        );
+
+
+        thinking.remove();
+
+
+        if (!response.ok) {
+
+
+            addMessage(
+                "⚠️ Learning Path service error.\n\n" +
+                rawText,
+                "bot"
+            );
+
+
+            return;
+
+        }
+
+
+        let data;
+
+
+        try {
+
+            data =
+                JSON.parse(rawText);
+
+        }
+        catch (error) {
+
+
+            addMessage(
+                "⚠️ Invalid server response.\n\n" +
+                rawText,
+                "bot"
+            );
+
+
+            return;
+
+        }
+
+
+        if (
+            data.success &&
+            data.result
+        ) {
+
+
+            addMessage(
+                data.result,
+                "bot",
+                true
+            );
+
+
+        }
+        else {
+
+
+            addMessage(
+                "⚠️ No learning path was returned.",
+                "bot"
+            );
+
+        }
+
+
+    }
+    catch (error) {
+
+
+        thinking.remove();
+
+
+        addMessage(
+            "⚠️ Unable to connect to EduGenie.\n\n" +
+            error.message,
+            "bot"
+        );
+
+
+        console.error(
+            "Learning Path error:",
+            error
+        );
+
+    }
+
+}
+
+
+
+/* =====================================================
+   ADD MESSAGE
+===================================================== */
+
+function addMessage(text, type, renderMarkdown = false) {
+
+    const chat = document.getElementById("chat");
+
+    const message = document.createElement("div");
+    message.className = "message " + type;
+
+    const bubble = document.createElement("div");
+    bubble.className = "bubble";
+
+    // Convert Gemini array/object response into text
+    if (typeof text !== "string") {
+
+        if (Array.isArray(text)) {
+
+            text = text.map(function(item, index) {
+
+                if (typeof item === "string") {
+                    return (index + 1) + ". " + item;
+                }
+
+                if (typeof item === "object" && item !== null) {
+                    return Object.entries(item)
+                        .map(function(entry) {
+                            return "**" + entry[0] + ":** " + entry[1];
+                        })
+                        .join("\n\n");
+                }
+
+                return String(item);
+
+            }).join("\n\n");
+
+        } else if (typeof text === "object" && text !== null) {
+
+            text = Object.entries(text)
+                .map(function(entry) {
+                    return "**" + entry[0] + ":** " + entry[1];
+                })
+                .join("\n\n");
+
+        } else {
+
+            text = String(text ?? "");
+
+        }
+    }
+
+    if (renderMarkdown) {
+
+        if (typeof marked !== "undefined") {
+            bubble.innerHTML = marked.parse(text);
+        } else {
+            bubble.innerText = text;
+        }
+
+        addCopyButtons(bubble);
+        renderMath(bubble);
+
+    } else {
+
+        bubble.innerText = text;
+    }
+
+    message.appendChild(bubble);
+    chat.appendChild(message);
+
+    chat.scrollTop = chat.scrollHeight;
+
+    return message;
+}
+
+
+
+
+/* =====================================================
+   THINKING
+===================================================== */
+
+function addThinkingMessage() {
+
+
+    const chat =
+        document.getElementById(
+            "chat"
+        );
+
+
+    const message =
+        document.createElement(
+            "div"
+        );
+
+
+    message.className =
+        "message bot";
+
+
+    const bubble =
+        document.createElement(
+            "div"
+        );
+
+
+    bubble.className =
+        "bubble";
+
+
+    bubble.innerHTML = `
+
+        <div class="thinking">
+
+            <div class="dot"></div>
+
+            <div class="dot"></div>
+
+            <div class="dot"></div>
+
+        </div>
+
+    `;
+
+
+    message.appendChild(
+        bubble
+    );
+
+
+    chat.appendChild(
+        message
+    );
+
+
+    chat.scrollTop =
+        chat.scrollHeight;
+
+
+    return message;
+
+}
+
+
+
+/* =====================================================
+   COPY CODE
+===================================================== */
+
+function addCopyButtons(
+    container
+) {
+
+
+    const codeBlocks =
+        container.querySelectorAll(
+            "pre"
+        );
+
+
+    codeBlocks.forEach(
+        function(pre) {
+
+
+            const wrapper =
+                document.createElement(
+                    "div"
+                );
+
+
+            wrapper.className =
+                "code-container";
+
+
+            pre.parentNode.insertBefore(
+                wrapper,
+                pre
+            );
+
+
+            wrapper.appendChild(
+                pre
+            );
+
+
+            const button =
+                document.createElement(
+                    "button"
+                );
+
+
+            button.className =
+                "copy-button";
+
+
+            button.innerText =
+                "Copy";
+
+
+            button.onclick =
+                async function() {
+
+
+                    try {
+
+
+                        await navigator
+                            .clipboard
+                            .writeText(
+                                pre.innerText
+                            );
+
+
+                        button.innerText =
+                            "Copied ✓";
+
+
+                        setTimeout(
+                            function() {
+
+                                button.innerText =
+                                    "Copy";
+
+                            },
+                            1500
+                        );
+
+
+                    }
+                    catch (error) {
+
+
+                        console.error(
+                            error
+                        );
+
+
+                    }
+
+                };
+
+
+            wrapper.appendChild(
+                button
+            );
+
+
+        }
+    );
+
+}
+
+
+
+/* =====================================================
+   MATH RENDERING
+===================================================== */
+
+function renderMath(
+    element
+) {
+
+
+    if (
+        typeof renderMathInElement ===
+        "function"
+    ) {
+
+
+        renderMathInElement(
+            element,
+            {
+
+                delimiters: [
+
+                    {
+                        left: "$$",
+                        right: "$$",
+                        display: true
+                    },
+
+                    {
+                        left: "\\[",
+                        right: "\\]",
+                        display: true
+                    },
+
+                    {
+                        left: "$",
+                        right: "$",
+                        display: false
+                    },
+
+                    {
+                        left: "\\(",
+                        right: "\\)",
+                        display: false
+                    }
+
+                ],
+
+                throwOnError: false
+
+            }
+        );
+
+    }
+
+}
+
+
+
+/* =====================================================
+   ENTER KEY
+===================================================== */
+
+function handleKey(
+    event
+) {
+
+
+    if (
+        event.key === "Enter" &&
+        !event.shiftKey
+    ) {
+
+
+        event.preventDefault();
+
+
+        askQuestion();
+
+    }
+
+}
+
+
+
+/* =====================================================
+   NEW CHAT
+===================================================== */
+
+function newChat() {
+
+
+    const chat =
+        document.getElementById(
+            "chat"
+        );
+
+
+    chat.innerHTML = `
+
+        <div
+            class="welcome"
+            id="welcome">
+
+            <h1>
+                👋 Welcome to EduGenie
+            </h1>
+
+            <p>
+                Ask me anything about
+                programming, science,
+                mathematics and more.
+            </p>
+
+        </div>
+
+    `;
+
+
+    document
+        .getElementById(
+            "question"
+        )
+        .focus();
+
+}
+
+
+
+/* =====================================================
+   REMOVE WELCOME
+===================================================== */
+
+function removeWelcome() {
+
+
+    const welcome =
+        document.getElementById(
+            "welcome"
+        );
+
+
+    if (welcome) {
+
+        welcome.remove();
+
+    }
+
+}
+
+
+</script>
+
+
+</body>
+
+</html>
